@@ -85,6 +85,12 @@ jobs:
           repository: jbbarth/redmine_base_rspec
           path: redmine/plugins/redmine_base_rspec
 
+      - name: Checkout dependencies - Organizations plugin
+        uses: actions/checkout@v3
+        with:
+          repository: jbbarth/redmine_organizations
+          path: redmine/plugins/redmine_organizations
+
       - name: Prepare Redmine source
         working-directory: redmine
         run: |
