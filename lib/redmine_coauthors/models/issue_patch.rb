@@ -7,11 +7,35 @@ module RedmineCoauthors
 
     # Returns true if usr or current user is allowed to view the issue
     def visible?(usr = nil)
-      usr ||= User.current
-      if authors.include?(usr)
-        usr = author
+      visibility = super
+      if visibility
+        return visibility
+      else
+        usr ||= User.current
+        if authors.include?(usr)
+          super(author)
+        else
+          visibility
+        end
       end
-      super(usr)
+    end
+
+    module ClassMethods
+      def visible_condition(user, options = {})
+        user_organization = user.organization
+        if user_organization.present?
+          coauthored_issues_statement = Issue.joins(:author => :organization).where(organizations: {id: user_organization.id}).select(:id).to_sql
+          "(#{super} OR #{Issue.table_name}.id IN (#{coauthored_issues_statement}) )"
+        else
+          super
+        end
+      end
+    end
+
+    def self.prepended(base)
+      class << base
+        prepend ClassMethods
+      end
     end
 
   end
