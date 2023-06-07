@@ -1,0 +1,11 @@
+#coauthors_status_field {
+    border-bottom: 1px #DDDDDD solid;
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+}
+
+#coauthors_status_field label {
+    width: 280px;
+    margin-right: 12px;
+
+}

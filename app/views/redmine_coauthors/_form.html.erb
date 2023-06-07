@@ -1,0 +1,10 @@
+<% if @issue.allow_coauthors?(User.current) %>
+
+  <p id="coauthors_status_field">
+    <%= f.select :coauthors_status,
+                 options_for_coauthors_select(@issue),
+                 label: l(:share_this_issue_with_my_team) %>
+  </p>
+
+<% end %>
+

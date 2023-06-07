@@ -21,6 +21,10 @@ RSpec.describe IssuesController, type: :controller do
     user_2.update_attribute(:organization_id, author_organization.id)
     user_7.update_attribute(:organization_id, author_organization.id)
 
+    # issue 7 is shared with author organization
+    issue_7.update_attribute(:coauthors_organization_id, author_organization.id)
+    issue_7.update_attribute(:coauthors_status, 1)
+
     # Remove role for non members
     Role.builtin(true).each { |role| role.remove_permission! :view_issues }
     # Add a role to another project

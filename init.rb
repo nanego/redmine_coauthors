@@ -10,5 +10,9 @@ Redmine::Plugin.register :redmine_coauthors do
   author_url 'https://github.com/nanego'
   requires_redmine_plugin :redmine_base_rspec, :version_or_higher => '0.0.4' if Rails.env.test?
   # requires_redmine_plugin :redmine_organizations, :version_or_higher => '0.0.1'
+
+  project_module :coauthored_issues do
+    permission :edit_coauthors, {}
+  end
 end
 
