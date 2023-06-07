@@ -19,36 +19,36 @@ module RedmineCoauthors
     end
 
     def editable?(user = User.current)
-      super || shared_with_coauthors?(user) ? super(author) : false
+      super || (shared_with_coauthors?(user) && author.present? ? super(author.present? ? author : user) : false)
     end
 
     # Returns true if user or current user is allowed to edit the issue
     def attributes_editable?(user = User.current)
-      super || shared_with_coauthors?(user) ? super(author) : false
+      super || (shared_with_coauthors?(user) && author.present? ? super(author.present? ? author : user) : false)
     end
 
     def attachments_addable?(user = User.current)
-      super || shared_with_coauthors?(user) ? super(author) : false
+      super || (shared_with_coauthors?(user) && author.present? ? super(author.present? ? author : user) : false)
     end
 
     # Overrides Redmine::Acts::Attachable::InstanceMethods#attachments_editable?
     def attachments_editable?(user = User.current)
-      super || shared_with_coauthors?(user) ? super(author) : false
+      super || (shared_with_coauthors?(user) && author.present? ? super(author) : false)
     end
 
     # Returns true if user or current user is allowed to add notes to the issue
     def notes_addable?(user = User.current)
-      super || shared_with_coauthors?(user) ? super(author) : false
+      super || (shared_with_coauthors?(user) && author.present? ? super(author) : false)
     end
 
     # Returns true if user or current user is allowed to delete the issue
     def deletable?(user = User.current)
-      super || shared_with_coauthors?(user) ? super(author) : false
+      super || (shared_with_coauthors?(user) && author.present? ? super(author) : false)
     end
 
     # Overrides Redmine::Acts::Attachable::InstanceMethods#attachments_deletable?
     def attachments_deletable?(user = User.current)
-      super || shared_with_coauthors?(user) ? super(author) : false
+      super || (shared_with_coauthors?(user) && author.present? ? super(author) : false)
     end
 
     def visible_custom_field_values(user = nil)
@@ -173,9 +173,5 @@ class Issue < ActiveRecord::Base
       current_user == self.author &&
       author.organization.present?
   end
-
-  # def authors_organizations
-  #  [author.organization]
-  # end
 
 end
