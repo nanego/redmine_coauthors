@@ -9,8 +9,8 @@ RSpec.describe IssuesController, type: :controller do
            :projects_trackers, :workflows
 
   let!(:issue_7) { Issue.find(7) }
-  let!(:author_organization) { Organization.create(name: "coauthors organisation") }
-  let!(:different_organization) { Organization.create(name: "different organisation") }
+  let!(:author_organization) { Organization.find_or_create_by(name: "coauthors organisation") }
+  let!(:different_organization) { Organization.find_or_create_by(name: "different organisation") }
   let!(:user_2) { User.find(2) }
   let!(:user_7) { User.find(7) }
 
@@ -20,6 +20,9 @@ RSpec.describe IssuesController, type: :controller do
     # Add users to organization
     user_2.update_attribute(:organization_id, author_organization.id)
     user_7.update_attribute(:organization_id, author_organization.id)
+
+    # Activate coauthors module
+    issue_7.project.enable_module! :coauthored_issues
 
     # issue 7 is shared with author organization
     issue_7.update_attribute(:coauthors_organization_id, author_organization.id)

@@ -1,3 +1,6 @@
-# English strings go here for Rails i18n
 en:
-  # my_label: "My label"
+  field_coauthors_status: Coauthors
+  share_this_issue_with_my_team: "Share this issue with my team:"
+  share_with_no_one: No, I'm the only author
+  share_with_my_organization: Yes, share with my organization
+  project_module_coauthored_issues: Coauthors

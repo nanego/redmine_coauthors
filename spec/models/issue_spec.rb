@@ -8,7 +8,7 @@ RSpec.describe Issue, :type => :model do
   let!(:issue_7) { Issue.find(7) }
   let!(:user_2) { User.find(2) }
   let!(:user_7) { User.find(7) }
-  let!(:author_organization) { Organization.create(name: "coauthors organisation") }
+  let!(:author_organization) { Organization.find_or_create_by(name: "coauthors organisation") }
 
   before do
     user_2.update_attribute(:organization_id, author_organization.id)

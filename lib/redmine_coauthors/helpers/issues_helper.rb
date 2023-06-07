@@ -6,7 +6,7 @@ module PluginRedmineCoauthors
       possible_values = Issue::POSSIBLE_COAUTHORS_STATUSES.map do |key, value|
         case key
         when 1
-          val = "#{l(value)} (#{issue.author.organization.name_with_parents})"
+          val = "#{l(value)} (#{issue.author.organization&.name_with_parents})"
         else
           val = l(value)
         end

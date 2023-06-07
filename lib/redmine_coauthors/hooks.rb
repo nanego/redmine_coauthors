@@ -8,6 +8,7 @@ module RedmineCoauthors
         require_relative 'models/issue'
         require_relative 'helpers/issues_helper'
         require_relative 'controllers/issues_controller'
+        require_relative 'controllers/application_controller_patch'
       end
     end
 
