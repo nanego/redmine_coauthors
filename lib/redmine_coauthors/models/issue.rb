@@ -18,6 +18,11 @@ module RedmineCoauthors
       end
     end
 
+    # Returns the users that should be notified
+    def notified_users
+      super | notified_as_coauthor
+    end
+
     def editable?(user = User.current)
       super || (shared_with_coauthors?(user) && author.present? ? super(author.present? ? author : user) : false)
     end
@@ -157,6 +162,10 @@ class Issue < ActiveRecord::Base
 
   safe_attributes 'coauthors_status', 'coauthors_organization_id'
 
+  def coauthors_organizations
+    [self.coauthors_organization]
+  end
+
   def coauthors
     coauthors = [author]
     coauthors |= self.coauthors_organization.users if author.present? && self.coauthors_organization.present?
@@ -172,6 +181,13 @@ class Issue < ActiveRecord::Base
       current_user.allowed_to?(:edit_coauthors, self.project) &&
       current_user == self.author &&
       author.organization.present?
+  end
+
+  def notified_as_coauthor
+    # Co-Authors are always notified unless they have been
+    # locked or don't want to be notified
+    notified_coauthors = coauthors - [author]
+    notified_coauthors.select { |u| u.active? && u.notify_about?(self) }
   end
 
 end

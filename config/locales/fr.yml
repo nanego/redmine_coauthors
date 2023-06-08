@@ -4,3 +4,6 @@ fr:
   share_with_no_one: Non, je suis l'unique demandeur
   share_with_my_organization: Oui, partager avec mon organisation
   project_module_coauthored_issues: Co-auteurs
+  permission_edit_coauthors: Ajouter des co-auteurs
+  shared_with_these_organizations: "Partagé avec ces équipes : "
+  shared_with_this_organization: "Partagé avec cette équipe : "

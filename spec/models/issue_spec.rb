@@ -13,6 +13,7 @@ RSpec.describe Issue, :type => :model do
   before do
     user_2.update_attribute(:organization_id, author_organization.id)
     user_7.update_attribute(:organization_id, author_organization.id)
+    user_7.update_attribute(:mail_notification, 'all')
 
     # issue 7 is shared with author organization
     issue_7.update_attribute(:coauthors_organization_id, author_organization.id)
@@ -44,6 +45,24 @@ RSpec.describe Issue, :type => :model do
       it "allows a user to see an issue created by a coauthor" do
         issue_7.update_attribute(:coauthors_organization_id, author_organization.id)
         expect(issue_7.visible?(user_7)).to be true
+      end
+    end
+
+    describe "notified_users" do
+      it "notifies users who are co-authors" do
+        notified_as_coauthor = issue_7.notified_as_coauthor
+        expect(notified_as_coauthor).to_not be_nil
+        expect(notified_as_coauthor).to_not include User.anonymous
+        expect(notified_as_coauthor).to_not include user_2 # author
+        expect(notified_as_coauthor).to include user_7 # co-author
+      end
+
+      it "notifies all co-authors" do
+        notified_users = issue_7.notified_users
+        expect(notified_users).to_not be_nil
+        expect(notified_users).to_not include User.anonymous
+        expect(notified_users).to include user_2 # author
+        expect(notified_users).to include user_7 # co-author
       end
     end
 
