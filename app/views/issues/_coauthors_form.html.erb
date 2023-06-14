@@ -1,4 +1,4 @@
-<% if @issue.allow_coauthors?(User.current) %>
+<% if @issue.allow_coauthors_edition?(User.current) %>
 
   <p id="coauthors_status_field">
     <%= f.select :coauthors_status,

@@ -200,7 +200,7 @@ class Issue < ActiveRecord::Base
     coauthors_status > 0 && coauthors.include?(user)
   end
 
-  def allow_coauthors?(current_user)
+  def allow_coauthors_edition?(current_user)
     self.project.module_enabled?("coauthored_issues") &&
       current_user.allowed_to?(:edit_coauthors, self.project) &&
       current_user == self.author &&

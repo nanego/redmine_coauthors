@@ -2,7 +2,7 @@ require_dependency 'issues_controller'
 
 class IssuesController
 
-  append_before_action :set_author_organization, :only => [:create]
+  append_before_action :set_author_organization, :only => [:create, :update]
 
   private
 
