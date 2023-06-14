@@ -3,7 +3,8 @@ en:
   share_this_issue_with_my_team: "Share this issue with my team:"
   share_with_no_one: No, I'm the only author
   share_with_my_organization: Yes, share with my organization
+  share_with_my_organization_and_parent: Yes, share with my organization and the parent organization
   project_module_coauthored_issues: Coauthors
   permission_edit_coauthors: Add coauthors
-  shared_with_these_organizations: "Shared with these teams: "
-  shared_with_this_organization: "Shared with this team: "
+  shared_with_these_organizations: "Shared with the teams"
+  shared_with_this_organization: "Shared with the team"

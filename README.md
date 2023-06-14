@@ -1,5 +1,11 @@
 # redmine_coauthors
 
+This Redmine plugin make it possible to share the issues with co-authors who are teammates in the same organization.
+
+## Requirements:
+
+* this plugin requires the installation of the redmine_organizations plugin (see [here](https://github.com/jbbarth/redmine_organizations))
+
 ## Test status
 ----------
 

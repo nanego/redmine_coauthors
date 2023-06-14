@@ -132,8 +132,24 @@ module RedmineCoauthors
       def visible_condition(user, options = {})
         user_organization = user.organization
         if user_organization.present?
-          coauthored_issues_statement = Issue.joins(:coauthors_organization).where(organizations: { id: user_organization.id }).select(:id).to_sql
-          "(#{super} OR #{Issue.table_name}.id IN (#{coauthored_issues_statement}) )"
+
+          # coauthors_status 1 or 2
+          coauthored_issues_statement_from_user_organization = Issue.joins(:coauthors_organization)
+                                                                    .where(organizations: { id: user_organization.id })
+                                                                    .where(coauthors_status: [1, 2])
+                                                                    .select(:id)
+                                                                    .to_sql
+          coauthors_statement_through_same_organization = "#{Issue.table_name}.id IN (#{coauthored_issues_statement_from_user_organization})"
+
+          # coauthors_status 2
+          coauthored_issues_statement_from_child_organization = Issue.joins(:coauthors_organization)
+                                                                  .where(organizations: { parent_id: user_organization.id })
+                                                                  .where(coauthors_status: 2)
+                                                                  .select(:id)
+                                                                  .to_sql
+          coauthors_statement_through_child_organization = "#{Issue.table_name}.id IN (#{coauthored_issues_statement_from_child_organization})"
+
+          "(#{super} OR #{coauthors_statement_through_same_organization} OR #{coauthors_statement_through_child_organization})"
         else
           super
         end
@@ -154,7 +170,8 @@ class Issue < ActiveRecord::Base
   prepend RedmineCoauthors::IssuePatch
 
   POSSIBLE_COAUTHORS_STATUSES = { 0 => :share_with_no_one,
-                                  1 => :share_with_my_organization }
+                                  1 => :share_with_my_organization,
+                                  2 => :share_with_my_organization_and_parent }
 
   belongs_to :coauthors_organization,
              class_name: 'Organization',
@@ -163,12 +180,19 @@ class Issue < ActiveRecord::Base
   safe_attributes 'coauthors_status', 'coauthors_organization_id'
 
   def coauthors_organizations
-    [self.coauthors_organization]
+    case coauthors_status
+    when 2
+      [self.coauthors_organization.parent, self.coauthors_organization].compact
+    when 1
+      [self.coauthors_organization].compact
+    else
+      []
+    end
   end
 
   def coauthors
     coauthors = [author]
-    coauthors |= self.coauthors_organization.users if author.present? && self.coauthors_organization.present?
+    coauthors |= self.coauthors_organizations.map(&:users).flatten.uniq.compact if author.present? && self.coauthors_organizations.any?
     coauthors
   end
 

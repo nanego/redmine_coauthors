@@ -2,8 +2,9 @@ fr:
   field_coauthors_status: Co-auteurs
   share_this_issue_with_my_team: "Partager cette demande avec mon équipe :"
   share_with_no_one: Non, je suis l'unique demandeur
-  share_with_my_organization: Oui, partager avec mon organisation
+  share_with_my_organization: Oui, partager avec mon organisation de rattachement
+  share_with_my_organization_and_parent: Oui, partager avec mon organisation et l'organisation parente
   project_module_coauthored_issues: Co-auteurs
   permission_edit_coauthors: Ajouter des co-auteurs
-  shared_with_these_organizations: "Partagé avec ces équipes : "
-  shared_with_this_organization: "Partagé avec cette équipe : "
+  shared_with_these_organizations: "Partagé avec les équipes"
+  shared_with_this_organization: "Partagé avec l'équipe"

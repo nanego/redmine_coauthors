@@ -1,4 +1,4 @@
 <% if @issue.coauthors.size > 1 %>
   <% label = @issue.coauthors_organizations.size > 1 ? l(:shared_with_these_organizations) : l(:shared_with_this_organization) %>
-  <%= label %> <%= @issue.coauthors_organizations.map { |o| link_to_organization(o) }.join(l('support.array.two_words_connector')).html_safe %>
+  <%= label %> <%= @issue.coauthors_organizations.map { |o| link_to_organization(o, link_ancestors: false) }.join(l('support.array.two_words_connector')).html_safe %>
 <% end %>
