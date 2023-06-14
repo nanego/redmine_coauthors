@@ -22,10 +22,10 @@ describe "IssuesHelperPatch" do
     User.current = nil
   end
 
-  let(:journal) { Journal.new(:journalized => User.find(5), :user_id => 1) }
+  let(:journal) { Journal.new(:journalized => Issue.find(1), :user_id => 1) }
 
   describe "coauthors' changes" do
-    it "displays a journal entry when coatuhor_status has changed" do
+    it "displays a journal entry when coauthor_status has changed" do
       detail = JournalDetail.new(:journal => journal, :property => 'attr', :old_value => "0", :value => "1", :prop_key => 'coauthors_status')
       expect(show_detail(detail, true)).to eq "Coauthors changed from 'No, I'm the only author' to 'Yes, share with my organization'"
     end
