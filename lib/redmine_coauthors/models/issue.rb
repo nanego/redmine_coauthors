@@ -143,10 +143,10 @@ module RedmineCoauthors
 
           # coauthors_status 2
           coauthored_issues_statement_from_child_organization = Issue.joins(:coauthors_organization)
-                                                                  .where(organizations: { parent_id: user_organization.id })
-                                                                  .where(coauthors_status: 2)
-                                                                  .select(:id)
-                                                                  .to_sql
+                                                                     .where(organizations: { parent_id: user_organization.id })
+                                                                     .where(coauthors_status: 2)
+                                                                     .select(:id)
+                                                                     .to_sql
           coauthors_statement_through_child_organization = "#{Issue.table_name}.id IN (#{coauthored_issues_statement_from_child_organization})"
 
           "(#{super} OR #{coauthors_statement_through_same_organization} OR #{coauthors_statement_through_child_organization})"
@@ -202,8 +202,7 @@ class Issue < ActiveRecord::Base
 
   def allow_coauthors_edition?(current_user)
     self.project.module_enabled?("coauthored_issues") &&
-      current_user.allowed_to?(:edit_coauthors, self.project) &&
-      current_user == self.author &&
+      (current_user == self.author && current_user.allowed_to?(:edit_coauthors, self.project) || current_user.admin?) &&
       author.organization.present?
   end
 
