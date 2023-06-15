@@ -219,7 +219,7 @@ class Issue < ActiveRecord::Base
   end
 
   def module_coauthors_enable?
-    project.module_enabled?("coauthored_issues")
+    project&.module_enabled?("coauthored_issues")
   end
 
 end
