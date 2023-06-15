@@ -22,6 +22,9 @@ RSpec.describe Issue, :type => :model do
     issue_7.update_attribute(:coauthors_organization_id, author_organization.id)
     issue_7.update_attribute(:coauthors_status, 1)
 
+    # Activate co-authors module
+    issue_7.project.enable_module!("coauthored_issues")
+
     # author organization has a parent organization
     author_organization.update_attribute(:parent_id, author_parent_organization.id)
 
@@ -32,6 +35,15 @@ RSpec.describe Issue, :type => :model do
   context "An issue have multiple coauthors" do
     it "returns an array with only the author if the issue has no coauthors-organization" do
       issue_7.update_attribute(:coauthors_organization_id, nil)
+      expect(issue_7.coauthors).to eq [user_2]
+    end
+
+    it "returns an array with only the author if the co-authors module is not enabled in the project" do
+      issue_7.project.disable_module!("coauthored_issues")
+      issue_7.reload
+      issue_7.update_attribute(:coauthors_organization_id, author_organization.id)
+      expect(author_organization.users).to include(user_2)
+      expect(author_organization.users).to include(user_7)
       expect(issue_7.coauthors).to eq [user_2]
     end
 

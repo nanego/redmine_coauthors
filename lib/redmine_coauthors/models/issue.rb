@@ -10,7 +10,7 @@ module RedmineCoauthors
         return visibility
       else
         usr ||= User.current
-        if coauthors.include?(usr)
+        if coauthors.include?(usr) && usr != author
           super(author)
         else
           visibility
@@ -192,16 +192,20 @@ class Issue < ActiveRecord::Base
 
   def coauthors
     coauthors = [author]
-    coauthors |= self.coauthors_organizations.map(&:users).flatten.uniq.compact if author.present? && self.coauthors_organizations.any?
+    if module_coauthors_enable? && author.present? && self.coauthors_organizations.any?
+      coauthors |= self.coauthors_organizations.map(&:users).flatten.uniq.compact
+    end
     coauthors
   end
 
   def shared_with_coauthors?(user = User.current)
-    coauthors_status > 0 && coauthors.include?(user)
+    module_coauthors_enable? &&
+      coauthors_status > 0 &&
+      coauthors.include?(user)
   end
 
   def allow_coauthors_edition?(current_user)
-    self.project.module_enabled?("coauthored_issues") &&
+    module_coauthors_enable? &&
       (current_user == self.author && current_user.allowed_to?(:edit_coauthors, self.project) || current_user.admin?) &&
       author.organization.present?
   end
@@ -209,8 +213,13 @@ class Issue < ActiveRecord::Base
   def notified_as_coauthor
     # Co-Authors are always notified unless they have been
     # locked or don't want to be notified
+    return [] unless module_coauthors_enable?
     notified_coauthors = coauthors - [author]
     notified_coauthors.select { |u| u.active? && u.notify_about?(self) }
+  end
+
+  def module_coauthors_enable?
+    project.module_enabled?("coauthored_issues")
   end
 
 end
