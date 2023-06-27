@@ -4,11 +4,8 @@ module PluginRedmineCoauthors
   module IssuesHelper
     def options_for_coauthors_select(issue)
       possible_values = Issue::POSSIBLE_COAUTHORS_STATUSES.map do |key, value|
-        case key
-        when 2
-          val = "#{l(value)} (#{issue.author.organization&.name_with_parents} #{l("support.array.sentence_connector")} #{issue.author.organization&.parent&.name_with_parents})"
-        when 1
-          val = "#{l(value)} (#{issue.author.organization&.name_with_parents})"
+        if key > 0
+          val = "#{l(value)} (#{issue.coauthors_organizations(status: key, author_organization: issue.author.organization).map(&:name_with_parents).to_sentence})"
         else
           val = l(value)
         end

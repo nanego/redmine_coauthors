@@ -133,23 +133,36 @@ module RedmineCoauthors
         user_organization = user.organization
         if user_organization.present?
 
-          # coauthors_status 1 or 2
+          user_organization_child_ids = user_organization.child_ids
+
+          # coauthors_status 1, 2 or 3
           coauthored_issues_statement_from_user_organization = Issue.joins(:coauthors_organization)
                                                                     .where(organizations: { id: user_organization.id })
-                                                                    .where(coauthors_status: [1, 2])
+                                                                    .where(coauthors_status: [1, 2, 3])
                                                                     .select(:id)
                                                                     .to_sql
           coauthors_statement_through_same_organization = "#{Issue.table_name}.id IN (#{coauthored_issues_statement_from_user_organization})"
 
-          # coauthors_status 2
+          # coauthors_status 2 or 3
           coauthored_issues_statement_from_child_organization = Issue.joins(:coauthors_organization)
-                                                                     .where(organizations: { parent_id: user_organization.id })
-                                                                     .where(coauthors_status: 2)
+                                                                     .where(organizations: { id: user_organization_child_ids })
+                                                                     .where(coauthors_status: [2, 3])
                                                                      .select(:id)
                                                                      .to_sql
           coauthors_statement_through_child_organization = "#{Issue.table_name}.id IN (#{coauthored_issues_statement_from_child_organization})"
 
-          "(#{super} OR #{coauthors_statement_through_same_organization} OR #{coauthors_statement_through_child_organization})"
+          # coauthors_status 3
+          coauthored_issues_statement_from_grandchild_organization = Issue.joins(:coauthors_organization)
+                                                                          .where(organizations: { parent_id: user_organization_child_ids })
+                                                                          .where(coauthors_status: 3)
+                                                                          .select(:id)
+                                                                          .to_sql
+          coauthors_statement_through_grandchild_organization = "#{Issue.table_name}.id IN (#{coauthored_issues_statement_from_grandchild_organization})"
+
+          "(#{super}
+              OR #{coauthors_statement_through_same_organization}
+              OR #{coauthors_statement_through_child_organization}
+              OR #{coauthors_statement_through_grandchild_organization})"
         else
           super
         end
@@ -171,7 +184,8 @@ class Issue < ActiveRecord::Base
 
   POSSIBLE_COAUTHORS_STATUSES = { 0 => :share_with_no_one,
                                   1 => :share_with_my_organization,
-                                  2 => :share_with_my_organization_and_parent }
+                                  2 => :share_with_my_organization_and_parent,
+                                  3 => :share_with_my_organization_and_two_parents }
 
   belongs_to :coauthors_organization,
              class_name: 'Organization',
@@ -179,12 +193,18 @@ class Issue < ActiveRecord::Base
 
   safe_attributes 'coauthors_status', 'coauthors_organization_id'
 
-  def coauthors_organizations
-    case coauthors_status
+  def coauthors_organizations(status: nil, author_organization: nil)
+    status ||= coauthors_status
+    author_organization ||= self.coauthors_organization
+    return [] if author_organization.blank?
+
+    case status
+    when 3
+      [author_organization.parent.try(:parent), author_organization.parent, author_organization].compact
     when 2
-      [self.coauthors_organization.parent, self.coauthors_organization].compact
+      [author_organization.parent, author_organization].compact
     when 1
-      [self.coauthors_organization].compact
+      [author_organization].compact
     else
       []
     end
