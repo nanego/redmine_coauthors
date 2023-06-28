@@ -11,7 +11,7 @@ module PluginRedmineCoauthors
         end
         [val, key]
       end
-      options_for_select(possible_values, issue.persisted? ? issue.coauthors_status : "1")
+      options_for_select(possible_values, issue.coauthors_status.to_i)
     end
 
     # Returns the textual representation of a single journal detail
