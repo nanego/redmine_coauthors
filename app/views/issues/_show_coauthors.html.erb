@@ -1,4 +1,5 @@
-<% if @issue.coauthors.size > 1 %>
-  <% label = @issue.coauthors_organizations.size > 1 ? l(:shared_with_these_organizations) : l(:shared_with_this_organization) %>
-  <%= label %> <%= @issue.coauthors_organizations.map { |o| link_to_organization(o, link_ancestors: false, title: o.users.active.map(&:to_s).join(', ')) }.to_sentence.html_safe %>
+<% coauthors_organizations = @issue.coauthors_organizations %>
+<% if coauthors_organizations.size > 1 %>
+  <% label = coauthors_organizations.size > 1 ? l(:shared_with_these_organizations) : l(:shared_with_this_organization) %>
+  <%= label %> <%= coauthors_organizations.map { |o| link_to_organization(o, link_ancestors: false, title: o.users.active.map(&:to_s).join(', ')) }.to_sentence.html_safe %>
 <% end %>
