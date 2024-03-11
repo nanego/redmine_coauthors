@@ -1,6 +1,6 @@
 require_dependency 'issue'
 
-module RedmineCoauthors
+module RedmineCoauthors::Models
   module IssuePatch
 
     # Returns true if usr or current user is allowed to view the issue
@@ -180,7 +180,7 @@ end
 
 class Issue < ActiveRecord::Base
 
-  prepend RedmineCoauthors::IssuePatch
+  prepend RedmineCoauthors::Models::IssuePatch
 
   POSSIBLE_COAUTHORS_STATUSES = { 0 => :share_with_no_one,
                                   1 => :share_with_my_organization,

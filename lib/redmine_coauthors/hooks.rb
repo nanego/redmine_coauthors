@@ -5,9 +5,9 @@ module RedmineCoauthors
 
     class ModelHook < Redmine::Hook::Listener
       def after_plugins_loaded(_context = {})
-        require_relative 'models/issue'
-        require_relative 'helpers/issues_helper'
-        require_relative 'controllers/issues_controller'
+        require_relative 'models/issue_patch'
+        require_relative 'helpers/issues_helper_patch'
+        require_relative 'controllers/issues_controller_patch'
         require_relative 'controllers/application_controller_patch'
       end
     end

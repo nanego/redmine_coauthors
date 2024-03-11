@@ -1,7 +1,7 @@
 require_dependency 'application_controller'
 
-module PluginCoauthors
-  module ApplicationController
+module RedmineCoauthors::Controllers
+  module ApplicationControllerPatch
 
     def authorize(ctrl = params[:controller], action = params[:action], global = false)
       if ctrl == "issues" && (%w(show edit update).include?(action))
@@ -18,4 +18,4 @@ module PluginCoauthors
   end
 end
 
-ApplicationController.prepend PluginCoauthors::ApplicationController
+ApplicationController.prepend RedmineCoauthors::Controllers::ApplicationControllerPatch

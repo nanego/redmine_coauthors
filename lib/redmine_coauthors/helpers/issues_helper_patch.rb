@@ -1,7 +1,7 @@
 require_dependency 'issues_helper'
 
-module PluginRedmineCoauthors
-  module IssuesHelper
+module RedmineCoauthors::Helpers
+  module IssuesHelperPatch
     def options_for_coauthors_select(issue)
       possible_values = Issue::POSSIBLE_COAUTHORS_STATUSES.map do |key, value|
         if key > 0
@@ -39,5 +39,5 @@ module PluginRedmineCoauthors
   end
 end
 
-IssuesHelper.prepend PluginRedmineCoauthors::IssuesHelper
+IssuesHelper.prepend RedmineCoauthors::Helpers::IssuesHelperPatch
 ActionView::Base.prepend IssuesHelper
