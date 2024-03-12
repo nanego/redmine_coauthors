@@ -88,6 +88,8 @@ jobs:
       - name: Prepare Redmine source
         working-directory: redmine
         run: |
+          # Add missing :groups_users fixture to API tests #TODO: remove next line when fixed in Redmine core
+          sed -i='' 's/^  fixtures :users/&, :groups_users/' test/integration/api_test/users_test.rb
           sed -i '/rubocop/d' Gemfile
           rm -f .rubocop*
           cp plugins/redmine_base_rspec/spec/support/database-${{ matrix.db }}.yml config/database.yml
