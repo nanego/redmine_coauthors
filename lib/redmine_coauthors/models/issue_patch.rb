@@ -178,7 +178,7 @@ module RedmineCoauthors::Models
   end
 end
 
-class Issue < ActiveRecord::Base
+class Issue
 
   prepend RedmineCoauthors::Models::IssuePatch
 
