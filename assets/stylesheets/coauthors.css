@@ -5,7 +5,10 @@
 }
 
 #coauthors_status_field label {
-    width: 280px;
+    width: 310px;
     margin-right: 12px;
+}
 
+#coauthors_status_field select {
+    max-width: 700px;
 }
