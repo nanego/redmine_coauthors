@@ -3,6 +3,13 @@ require_dependency 'issue'
 module RedmineCoauthors::Models
   module IssuePatch
 
+    def copy_from(arg, options = {})
+      super
+      self.coauthors_status = 0
+      self.coauthors_organization_id = nil
+      self
+    end
+
     # Returns true if usr or current user is allowed to view the issue
     def visible?(usr = nil)
       visibility = super
@@ -191,7 +198,8 @@ class Issue
              class_name: 'Organization',
              optional: true
 
-  safe_attributes 'coauthors_status', 'coauthors_organization_id'
+  safe_attributes 'coauthors_status',
+                  :if => lambda { |issue, user| issue.allow_coauthors_edition?(user) }
 
   def coauthors_organizations(status: nil, author_organization: nil)
     status ||= coauthors_status
@@ -227,7 +235,7 @@ class Issue
   def allow_coauthors_edition?(current_user)
     module_coauthors_enable? &&
       (current_user == self.author && current_user.allowed_to?(:edit_coauthors, self.project) || current_user.admin?) &&
-      author.organization.present?
+      author&.organization.present?
   end
 
   def notified_as_coauthor

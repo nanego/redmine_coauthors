@@ -81,4 +81,91 @@ RSpec.describe IssuesController, type: :controller do
 
   end
 
+  describe "sharing permissions" do
+    let(:new_issue_params) { { tracker_id: 1, subject: "Shared issue", priority_id: 5 } }
+
+    before { Role.find(1).add_permission! :edit_coauthors }
+
+    def update_issue_7(user_id, attributes)
+      @request.session[:user_id] = user_id
+      patch :update, params: { id: issue_7.id, issue: attributes }
+      expect(response).to have_http_status(:found)
+      issue_7.reload
+    end
+
+    it "lets an author with edit_coauthors share a new issue with their own organization only" do
+      @request.session[:user_id] = 2
+      post :create, params: { project_id: 1, issue: new_issue_params.merge(coauthors_status: 1, coauthors_organization_id: different_organization.id) }
+
+      issue = Issue.find_by!(subject: "Shared issue")
+      expect(issue.coauthors_status).to eq(1)
+      expect(issue.coauthors_organization_id).to eq(author_organization.id)
+    end
+
+    it "does not let an author without edit_coauthors share a new issue" do
+      Role.find(1).remove_permission! :edit_coauthors
+      @request.session[:user_id] = 2
+      post :create, params: { project_id: 1, issue: new_issue_params.merge(coauthors_status: 1, coauthors_organization_id: different_organization.id) }
+
+      issue = Issue.find_by!(subject: "Shared issue")
+      expect(issue.coauthors_status).to eq(0)
+      expect(issue.coauthors_organization_id).to be_nil
+    end
+
+    it "does not let another user with edit rights widen the sharing" do
+      update_issue_7(3, coauthors_status: 3)
+      expect(issue_7.coauthors_status).to eq(1)
+    end
+
+    it "does not let another user with edit rights change the shared organization" do
+      update_issue_7(3, coauthors_organization_id: different_organization.id)
+      expect(issue_7.coauthors_organization_id).to eq(author_organization.id)
+    end
+
+    it "does not let the author pick another organization" do
+      update_issue_7(2, coauthors_organization_id: different_organization.id)
+      expect(issue_7.coauthors_organization_id).to eq(author_organization.id)
+    end
+
+    [2, 3].each do |status|
+      it "lets an author with edit_coauthors choose sharing level #{status}" do
+        update_issue_7(2, coauthors_status: status)
+        expect(issue_7.coauthors_status).to eq(status)
+        expect(issue_7.coauthors_organization_id).to eq(author_organization.id)
+      end
+    end
+
+    context "when copying a shared issue" do
+      before do
+        Role.find(1).add_permission! :copy_issues
+        Role.find(2).add_permission! :copy_issues
+      end
+
+      def copy_issue_7(user_id, attributes = {})
+        @request.session[:user_id] = user_id
+        post :create, params: { project_id: 1, copy_from: issue_7.id, issue: new_issue_params.merge(attributes) }
+        Issue.find_by!(subject: "Shared issue")
+      end
+
+      it "resets the sharing for the new author" do
+        copy = copy_issue_7(3)
+        expect(copy.author_id).to eq(3)
+        expect(copy.coauthors_status).to eq(0)
+        expect(copy.coauthors_organization_id).to be_nil
+      end
+
+      it "lets an author with edit_coauthors share the copy with their own organization" do
+        copy = copy_issue_7(2, coauthors_status: 2)
+        expect(copy.coauthors_status).to eq(2)
+        expect(copy.coauthors_organization_id).to eq(author_organization.id)
+      end
+    end
+
+    it "lets an admin change the sharing of an issue" do
+      update_issue_7(1, coauthors_status: 2)
+      expect(issue_7.coauthors_status).to eq(2)
+      expect(issue_7.coauthors_organization_id).to eq(author_organization.id)
+    end
+  end
+
 end

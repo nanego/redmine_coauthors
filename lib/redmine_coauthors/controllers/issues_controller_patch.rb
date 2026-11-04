@@ -5,7 +5,7 @@ module RedmineCoauthors::Controllers
 
     def set_author_organization
       if params[:issue].present?
-        if params[:issue][:coauthors_status].present?
+        if params[:issue][:coauthors_status].present? && @issue.allow_coauthors_edition?(User.current)
           @issue.coauthors_organization_id = @issue.author.organization_id
         end
       end
